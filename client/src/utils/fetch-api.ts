@@ -1,14 +1,30 @@
-const STRAPI_BASE_URL = process.env.STRAPI_BASE_URL || "http://localhost:1337";
-import axios from "axios";
+export async function fetchAPI(url: string, options: FetchAPIOptions) {
+  const { method, authToken, body, next } = options;
 
-export async function fetchApi(url, method, body) {
-  const response = await axios({
-    url: `${STRAPI_BASE_URL}${url}`,
+  const headers: RequestInit & { next?: NextFetchRequestConfig } = {
     method,
     headers: {
       "Content-Type": "application/json",
+      ...(authToken && { Authorization: `Bearer ${authToken}` }),
     },
-    data: body,
-  });
-  return response.data;
+    ...(body && { body: JSON.stringify(body) }),
+    ...(next && { next }),
+  };
+
+  try {
+    const response = await fetch(url, headers);
+    const contentType = response.headers.get("content-type");
+    if (
+      contentType &&
+      contentType.includes("application/json") &&
+      response.ok
+    ) {
+      return await response.json();
+    } else {
+      return { status: response.status, statusText: response.statusText };
+    }
+  } catch (error) {
+    console.error(`Error ${method} data:`, error);
+    throw error;
+  }
 }

@@ -365,6 +365,7 @@ export interface AdminUser extends Schema.CollectionType {
 export interface ApiHomePageHomePage extends Schema.SingleType {
   collectionName: 'home_pages';
   info: {
+    description: '';
     displayName: 'Home Page';
     pluralName: 'home-pages';
     singularName: 'home-page';
@@ -373,6 +374,7 @@ export interface ApiHomePageHomePage extends Schema.SingleType {
     draftAndPublish: false;
   };
   attributes: {
+    blocks: Attribute.DynamicZone<['blocks.info-block', 'blocks.hero-section']>;
     createdAt: Attribute.DateTime;
     createdBy: Attribute.Relation<
       'api::home-page.home-page',
